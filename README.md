@@ -19,16 +19,13 @@
   <figcaption align="center">Loop enquanto não encontra ofertas</figcaption>
 </figure>
 
-
 ## ⚠ Requisitos
 
-Instale o [NodeJS](https://nodejs.dev/download) em uma versão igual ou superior a 14.x. Se estiver utilizando Linux, certifique-se de ter o pacote `notify-osd` ou `libnotify-bin` para que as notificações Desktop funcionem (mais detalhes [aqui](https://github.com/mikaelbr/node-notifier#requirements)).
+Instale o [Node.js](https://nodejs.org/) **22 ou superior**. No Linux, instale `notify-osd` ou `libnotify-bin` para notificações desktop (detalhes [aqui](https://github.com/mikaelbr/node-notifier#requirements)).
+
+Para API + GUI via Docker: Docker Engine e Docker Compose.
 
 ## 📥 Instalação
-
-Clone o repositório/extraia o zip no local de sua preferência.
-
-Em um terminal/prompt de comando, navegue até o repositório execute:
 
 ```sh
 cd caminho-do-repo
@@ -36,20 +33,17 @@ npm install
 npm run build
 ```
 
-## 🤖 Utilização
+## 🤖 Utilização (CLI)
 
-Consulte os comandos disponíveis executando:
+Ajuda completa:
 
 ```sh
 npm start -- --help
+# ou
+make cli-dev -- --help
 ```
 
-<figure>
-  <img src="public/help.png" />
-  <figcaption align="center">Lista de comandos</figcaption>
-</figure>
-
-Tendo conhecimento das opções, basta combiná-las como se você estivesse fazendo uma busca no site da OLX.
+Documentação detalhada por grupo de opções: [docs/cli/README.md](docs/cli/README.md).
 
 Exemplo:
 
@@ -57,10 +51,44 @@ Exemplo:
 npm start -- --uf sp --ddd 12 --zona 'vale do paraiba' --cidade 'sao jose dos campos' --produto apartamento --preco 1
 ```
 
-Resulta em uma busca na URL:
+URL equivalente:
 
-<https://sp.olx.com.br/vale-do-paraiba-e-litoral-norte/vale-do-paraiba/sao-jose-dos-campos?q=apartamento>
+<https://www.olx.com.br/estado-sp/vale-do-paraiba-e-litoral-norte/vale-do-paraiba/sao-jose-dos-campos?q=apartamento>
 
+Desenvolvimento com recarga automática (CLI no host):
+
+```sh
+npm run dev -- --uf sp --ddd 12 --produto apartamento --preco 300000
+```
+
+## 🖥 Interface web + API
+
+### Docker (recomendado)
+
+```sh
+make dev   # API + Vite com hot reload (http://localhost:5173)
+make up    # stack de produção (GUI em http://localhost:8080)
+make down  # para os containers
+```
+
+### Host
+
+```sh
+npm run dev:gui
+```
+
+Veja [apps/gui/README.md](apps/gui/README.md).
+
+## 🏗 Estrutura do monorepo
+
+| Pacote          | Função                            |
+| --------------- | --------------------------------- |
+| `packages/core` | Domínio compartilhado (`@garimpeiro/core`) |
+| `apps/cli`      | Linha de comando e loop (isola; só depende do core) |
+| `apps/api`      | API HTTP Fastify (isola; só depende do core) |
+| `apps/gui`      | SPA React + Vite (isola; fala com a API via HTTP; tipos via `@garimpeiro/core/browser`) |
+
+Apps **não** importam uns aos outros. Sempre faça o build do core primeiro (`npm run build` na raiz já ordena isso). Imports internos usam o alias `@/` (ex.: `@/run-loop.js`).
 
 ## 📄 Licença e CopyLeft
 
@@ -68,12 +96,12 @@ Esse projeto segue a [licença AGPL 3.0 ou superior](https://github.com/mrocha98
 
 Obs: Eu sou um programador, não um advogado.
 
-
 ## 🤝 Contribuições
 
 Caso tenha sugestões ou dúvidas abra um [issue](https://github.com/mrocha98/garimpeiro-olx/issues).
 
 Se gostou do projeto considere contribuir com um pull request e tenha a honra de preencher itens dessa lista:
+
 ### TODO
 
 - [ ] novos meios de notificação
@@ -88,6 +116,4 @@ Se gostou do projeto considere contribuir com um pull request e tenha a honra de
 - [ ] melhorar a documentação
   - [ ] mais exemplos
   - [ ] prints de notificações desktop em Windows e OSX
-- [ ] interface gráfica?
-
-
+- [x] interface gráfica (base em `apps/gui/`)

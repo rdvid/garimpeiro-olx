@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: .
+      target: api
+    ports:
+      - '3000:3000'
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      GARIMPEIRO_GUI_ORIGIN: http://localhost:8080
+    restart: unless-stopped
+
+  gui:
+    build:
+      context: .
+      target: gui
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+    restart: unless-stopped

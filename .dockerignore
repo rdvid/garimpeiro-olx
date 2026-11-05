@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+**/dist
+.git
+.vscode
+*.md
+!apps/gui/README.md
+.env
+.env.*
+coverage
+*.log
+.DS_Store
+agent-transcripts
+.cursor

@@ -1,13 +1,22 @@
 {
   "name": "garimpeiro-olx",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
   "description": "A web scraper that tracks OLX Brazil's products prices",
-  "main": "dist/index.js",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "tsnd --respawn --transpile-only --ignore-watch node_modules --no-notify src/index.ts",
-    "dev:with-args": "npm run dev -- --uf sp --ddd 12 --zona 'vale do paraiba' --cidade 'sao jose dos campos' --produto 'apartamento' --preco 300000 --paginas 3",
-    "build": "swc --delete-dir-on-start --quiet --out-dir dist/ src/"
+    "build": "npm run build -w @garimpeiro/core && npm run build -w @garimpeiro/cli && npm run build -w @garimpeiro/api",
+    "dev": "tsx watch apps/cli/src/main.ts",
+    "dev:with-args": "npm run dev -- --uf sp --ddd 12 --zona 'vale do paraiba' --cidade 'sao jose dos campos' --produto apartamento --preco 300000 --paginas 3",
+    "start": "node apps/cli/dist/main.js",
+    "dev:api": "tsx watch apps/api/src/server.ts",
+    "dev:gui": "concurrently -n api,gui -c blue,green \"npm run dev:api\" \"npm run dev -w gui\"",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -24,36 +33,19 @@
   ],
   "author": "Matheus Rocha <matheus_rocha98@outlook.com> (https://mrocha.xyz/)",
   "license": "AGPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/mrocha98/garimpeiro-olx/issues"
-  },
-  "homepage": "https://github.com/mrocha98/garimpeiro-olx#readme",
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "date-fns": "^2.23.0",
-    "got": "^11.8.2",
-    "jsdom": "^17.0.0",
-    "lodash.isempty": "^4.4.0",
-    "lodash.kebabcase": "^4.1.1",
-    "node-notifier": "^10.0.0",
-    "yargs": "^17.1.1"
+  "engines": {
+    "node": ">=22"
   },
   "devDependencies": {
-    "@swc/cli": "^0.1.49",
-    "@swc/core": "^1.2.85",
-    "@types/jsdom": "^16.2.13",
-    "@types/lodash.isempty": "^4.4.6",
-    "@types/lodash.kebabcase": "^4.1.6",
-    "@types/node": "^14.17.15",
-    "@types/node-notifier": "^8.0.1",
-    "@types/yargs": "^17.0.2",
-    "@typescript-eslint/eslint-plugin": "^4.31.0",
-    "@typescript-eslint/parser": "^4.31.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.0",
-    "ts-node-dev": "^1.1.8",
-    "typescript": "^4.4.2"
+    "@eslint/js": "^9.17.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.2"
   }
 }
