@@ -19,16 +19,12 @@
     "build": "tsup"
   },
   "dependencies": {
-    "chalk": "^5.4.1",
-    "date-fns": "^4.1.0",
     "got-scraping": "^4.1.1",
-    "jsdom": "^26.0.0",
-    "node-notifier": "^10.0.1"
+    "jsdom": "^26.0.0"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.2",
-    "@types/node-notifier": "^8.0.5",
     "tsup": "^8.3.5"
   }
 }

@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "@garimpeiro/core": "*",
+    "chalk": "^5.4.1",
     "date-fns": "^4.1.0",
+    "node-notifier": "^10.0.1",
     "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "@types/node-notifier": "^8.0.5",
     "@types/yargs": "^17.0.33",
     "tsup": "^8.3.5"
   }

@@ -1,6 +1,6 @@
 import notifier from 'node-notifier'
 
-import { getMessage, getTitle } from './shared.js'
+import { getMessage, getTitle } from '@/notifications/shared.js'
 
 export const desktopNotification = (
   product: string,

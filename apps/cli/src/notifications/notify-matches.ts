@@ -1,7 +1,8 @@
-import type { Ad } from '../scraping/ads-extractor.js'
-import type { NotificationChannels } from '../types/search-config.js'
-import { desktopNotification } from './desktop.js'
-import { logNotification } from './log.js'
+import type { Ad } from '@garimpeiro/core'
+
+import type { NotificationChannels } from '@/types/search-config.js'
+import { desktopNotification } from '@/notifications/desktop.js'
+import { logNotification } from '@/notifications/log.js'
 
 export function notifyMatches(
   matches: Ad[],

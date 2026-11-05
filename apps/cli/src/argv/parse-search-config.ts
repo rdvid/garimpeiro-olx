@@ -1,7 +1,8 @@
-import { parseScrapeInput, type SearchConfig } from '@garimpeiro/core'
+import { parseScrapeInput } from '@garimpeiro/core'
 import { minutesToMilliseconds } from 'date-fns'
 
 import { getArgv } from '@/argv/get-argv.js'
+import type { SearchConfig } from '@/types/search-config.js'
 
 export async function parseSearchConfigFromArgv(): Promise<SearchConfig> {
   const argv = await getArgv().parseAsync()

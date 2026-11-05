@@ -3,12 +3,12 @@ import {
   buildSearchUrls,
   fetchSearchPages,
   findMatchingAds,
-  formattedDate,
-  formattedHour,
-  notifyMatches,
-  type SearchConfig,
 } from '@garimpeiro/core'
 import { addMilliseconds } from 'date-fns'
+
+import { formattedDate, formattedHour } from '@/dates/formatted.js'
+import { notifyMatches } from '@/notifications/notify-matches.js'
+import type { SearchConfig } from '@/types/search-config.js'
 
 export async function runGarimpoIteration(config: SearchConfig): Promise<{
   hasMatches: boolean

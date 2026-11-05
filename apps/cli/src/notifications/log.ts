@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
-import { formattedFullDate } from '../dates/formatted.js'
-import { getFormatedPrice, getTitle } from './shared.js'
+import { formattedFullDate } from '@/dates/formatted.js'
+import { getFormatedPrice, getTitle } from '@/notifications/shared.js'
 
 const { italic, bold, underline, blue, yellowBright, whiteBright } = chalk
 
