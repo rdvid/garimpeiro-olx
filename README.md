@@ -86,7 +86,7 @@ Veja [apps/gui/README.md](apps/gui/README.md).
 | `packages/core` | Domínio compartilhado de scrape (`@garimpeiro/core`) |
 | `apps/cli`      | CLI: loop, argv, notificações desktop/log (isola; só depende do core) |
 | `apps/api`      | API HTTP Fastify (isola; só depende do core) |
-| `apps/gui`      | SPA React + Vite (isola; fala com a API via HTTP; tipos via `@garimpeiro/core/browser`) |
+| `apps/gui`      | SPA SaaS (dashboard/shell); HTTP → API; tipos via `@garimpeiro/core/browser` |
 
 Apps **não** importam uns aos outros. Sempre faça o build do core primeiro (`npm run build` na raiz já ordena isso). Imports internos usam o alias `@/` (ex.: `@/run-loop.js`).
 
