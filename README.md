@@ -1,31 +1,55 @@
-<h1 align="center">Garimpeiro OLX</h1>
-<p align="center">Procurando por algo na <i>OLX</i>? Seja avisado do <b>melhor preço</b>!</p>
-<br />
+# Heimdall
 
-## 👀 Demonstração
+<p align="center">
+  <img src="public/heimdall_icon.png" alt="Heimdall" width="128" />
+</p>
 
-<figure>
-  <img src="public/demo-notificacao-log.png" />
-  <figcaption align="center">Notificação de oferta via log</figcaption>
-</figure>
+<p align="center">
 
-<figure>
-  <img src="public/demo-notificacao-desktop-linux.png" />
-  <figcaption align="center">Notificação de oferta via desktop (Linux)</figcaption>
-</figure>
+![Node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)
+![npm workspaces](https://img.shields.io/badge/package-npm%20workspaces-blue)
+![Version](https://img.shields.io/badge/version-2.0.0-orange)
+![License](https://img.shields.io/badge/license-AGPL--3.0--or--later-lightgrey)
 
-<figure>
-  <img src="public/demo-nenhuma-oferta-encontrada.png" />
-  <figcaption align="center">Loop enquanto não encontra ofertas</figcaption>
-</figure>
+</p>
 
-## ⚠ Requisitos
+**Vigiando a OLX para você pegar o preço certo.**
 
-Instale o [Node.js](https://nodejs.org/) **22 ou superior**. No Linux, instale `notify-osd` ou `libnotify-bin` para notificações desktop (detalhes [aqui](https://github.com/mikaelbr/node-notifier#requirements)).
+Heimdall monitora anúncios na OLX dentro de uma faixa de preço: scrape local, matching por banda percentual, loop + notificações no CLI, e uma GUI SaaS via API Fastify. Ferramenta interna sob `personal-tools/` (pacotes npm ainda usam o escopo `@garimpeiro/*`).
 
-Para API + GUI via Docker: Docker Engine e Docker Compose.
+**Referência rápida:** [docs/cli/README.md](docs/cli/README.md)
 
-## 📥 Instalação
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Recommended workflow](#recommended-workflow)
+- [CLI reference](#cli-reference)
+- [Interface web + API](#interface-web--api)
+- [How it works](#how-it-works)
+- [File structure](#file-structure)
+- [Limitations](#limitations)
+- [Safety and operations](#safety-and-operations)
+- [License](#license)
+
+## Features
+
+- **Busca OLX:** monta URLs por UF, DDD/região, zona, cidade, produto, ordem e páginas.
+- **Faixa de preço:** filtra anúncios em torno do preço alvo (`percentual`).
+- **CLI (`@garimpeiro/cli`):** loop periódico, notificações via log e desktop (`node-notifier`).
+- **API (`@garimpeiro/api`):** `POST /api/scrape` e `GET /api/health` (Fastify).
+- **GUI (`apps/gui`):** shell SaaS (dashboard, nova busca, ofertas, buscas salvas, histórico) — workspace em `localStorage`.
+- **Core (`@garimpeiro/core`):** scrape, parsing de input, matching; entry browser-safe em `@garimpeiro/core/browser`.
+
+## Installation
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) **22+**
+- No Linux, para notificações desktop do CLI: `notify-osd` ou `libnotify-bin` ([detalhes](https://github.com/mikaelbr/node-notifier#requirements))
+- Para API + GUI via Docker: Docker Engine e Docker Compose
+
+### Steps
 
 ```sh
 cd caminho-do-repo
@@ -33,17 +57,49 @@ npm install
 npm run build
 ```
 
-## 🤖 Utilização (CLI)
+O build da raiz ordena **core → cli → api**. A GUI: `npm run build -w gui` ou `make build`.
 
-Ajuda completa:
+## Recommended workflow
+
+```mermaid
+flowchart LR
+  criteria[Criterios de busca]
+  criteria --> cliLoop[CLI loop]
+  criteria --> guiShot[GUI one-shot]
+  cliLoop --> core["@garimpeiro/core scrape"]
+  guiShot --> api["POST /api/scrape"]
+  api --> core
+  core --> matches[Ofertas na faixa]
+  matches --> notify[Log / desktop]
+  matches --> guiTable[Tabela de ofertas]
+```
+
+1. **CLI contínuo** — monitore e receba alertas:
+
+   ```sh
+   npm start -- --uf sp --ddd 12 --produto apartamento --preco 300000
+   # ou
+   make cli-dev -- --uf sp --ddd 12 --produto apartamento --preco 300000
+   ```
+
+2. **GUI + API** — uma execução por vez, com histórico local:
+
+   ```sh
+   make dev   # http://localhost:5173
+   ```
+
+## CLI reference
+
+Entry: `npm start -- [opções]` ou `node apps/cli/dist/main.js`.
+
+Ajuda:
 
 ```sh
 npm start -- --help
-# ou
 make cli-dev -- --help
 ```
 
-Documentação detalhada por grupo de opções: [docs/cli/README.md](docs/cli/README.md).
+Documentação por grupo de opções: [docs/cli/README.md](docs/cli/README.md).
 
 Exemplo:
 
@@ -55,20 +111,20 @@ URL equivalente:
 
 <https://www.olx.com.br/estado-sp/vale-do-paraiba-e-litoral-norte/vale-do-paraiba/sao-jose-dos-campos?q=apartamento>
 
-Desenvolvimento com recarga automática (CLI no host):
+Dev com recarga:
 
 ```sh
 npm run dev -- --uf sp --ddd 12 --produto apartamento --preco 300000
 ```
 
-## 🖥 Interface web + API
+## Interface web + API
 
 ### Docker (recomendado)
 
 ```sh
-make dev   # API + Vite com hot reload (http://localhost:5173)
-make up    # stack de produção (GUI em http://localhost:8080)
-make down  # para os containers
+make dev   # API + Vite (http://localhost:5173)
+make up    # produção (GUI em http://localhost:8080)
+make down
 ```
 
 ### Host
@@ -77,43 +133,58 @@ make down  # para os containers
 npm run dev:gui
 ```
 
-Veja [apps/gui/README.md](apps/gui/README.md).
+Detalhes: [apps/gui/README.md](apps/gui/README.md).
 
-## 🏗 Estrutura do monorepo
+| Variável | Onde | Padrão |
+|----------|------|--------|
+| `GARIMPEIRO_GUI_ORIGIN` | API | `http://localhost:5173` |
+| `VITE_API_PROXY_TARGET` | Vite | `http://localhost:3000` |
+| `PORT` / `HOST` | API | `3000` / `0.0.0.0` |
 
-| Pacote          | Função                            |
-| --------------- | --------------------------------- |
-| `packages/core` | Domínio compartilhado de scrape (`@garimpeiro/core`) |
-| `apps/cli`      | CLI: loop, argv, notificações desktop/log (isola; só depende do core) |
-| `apps/api`      | API HTTP Fastify (isola; só depende do core) |
-| `apps/gui`      | SPA SaaS (dashboard/shell); HTTP → API; tipos via `@garimpeiro/core/browser` |
+## How it works
 
-Apps **não** importam uns aos outros. Sempre faça o build do core primeiro (`npm run build` na raiz já ordena isso). Imports internos usam o alias `@/` (ex.: `@/run-loop.js`).
+1. **Critérios** — UF, DDD → região OLX, zona/cidade (kebab-case), produto, preço, percentual, ordem, páginas (`parseScrapeInput` no core).
+2. **Fetch** — páginas de busca via `got-scraping` + JSDOM.
+3. **Match** — anúncios na faixa `[preço × (1 − %/100), preço × (1 + %/100)]`.
+4. **CLI** — `notifyMatches` (log / desktop) e loop por `intervalo`.
+5. **GUI** — `POST /api/scrape`; KPIs e histórico ficam no navegador (`localStorage`).
 
-## 📄 Licença e CopyLeft
+Apps **não** importam uns aos outros. Sempre build do core primeiro. Imports internos usam `@/`.
 
-Esse projeto segue a [licença AGPL 3.0 ou superior](https://github.com/mrocha98/garimpeiro-olx/blob/main/LICENSE). Em resumo, você é livre para fazer o que quiser com o código fonte, desde que distribua suas modificações sob a mesma licença.
+## File structure
 
-Obs: Eu sou um programador, não um advogado.
+```text
+garimpeiro-olx/
+├── README.md
+├── package.json          # workspaces + scripts raiz
+├── Makefile
+├── docker-compose.yml
+├── docker-compose.dev.yml
+├── public/
+│   └── heimdall_icon.png
+├── docs/cli/
+├── packages/core/        # @garimpeiro/core
+└── apps/
+    ├── cli/              # @garimpeiro/cli
+    ├── api/              # @garimpeiro/api
+    └── gui/              # SPA Vite + React
+```
 
-## 🤝 Contribuições
+## Limitations
 
-Caso tenha sugestões ou dúvidas abra um [issue](https://github.com/mrocha98/garimpeiro-olx/issues).
+- HTML/DOM da OLX pode mudar e quebrar o extrator.
+- Respostas 403 / anti-bot dependem do cliente HTTP atual.
+- GUI: sem conta; buscas/histórico só neste navegador.
+- Notificações desktop são responsabilidade do CLI no host, não da GUI.
 
-Se gostou do projeto considere contribuir com um pull request e tenha a honra de preencher itens dessa lista:
+## Safety and operations
 
-### TODO
+- Uso pessoal / interno; respeite os termos da OLX e evite carga agressiva (`paginas`, intervalo do loop).
+- Não versionar segredos (não há `.env` obrigatório para o fluxo padrão).
+- Licença copyleft: alterações distribuídas devem permanecer AGPL.
 
-- [ ] novos meios de notificação
-  - [ ] SMS
-  - [ ] Email
-  - [ ] Whatsapp ([venom bot](https://github.com/orkestral/venom))
-- [ ] bot no telegram
-- [ ] cache
-  - [ ] status das urls
-  - [ ] preço máximo e mínimo
-- [ ] testes unitários
-- [ ] melhorar a documentação
-  - [ ] mais exemplos
-  - [ ] prints de notificações desktop em Windows e OSX
-- [x] interface gráfica (base em `apps/gui/`)
+## License
+
+[AGPL 3.0 ou superior](https://github.com/mrocha98/garimpeiro-olx/blob/main/LICENSE).
+
+Sugestões e PRs: [issues](https://github.com/mrocha98/garimpeiro-olx/issues).

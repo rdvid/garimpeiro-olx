@@ -29,12 +29,16 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <div className="brand-mark" aria-hidden>
-          G
-        </div>
+        <img
+          className="brand-mark"
+          src="/heimdall_icon.png"
+          alt=""
+          width={28}
+          height={28}
+        />
         <div className="brand-text">
-          <strong>Garimpeiro</strong>
-          <span>OLX price scout</span>
+          <strong>Heimdall</strong>
+          <span>OLX watchman</span>
         </div>
       </div>
 
